@@ -2,16 +2,31 @@
 const toggle     = document.getElementById('navToggle');
 const mobileMenu = document.getElementById('mobileMenu');
 
-toggle.addEventListener('click', () => {
-  mobileMenu.classList.toggle('open');
-  toggle.querySelector('i').className = mobileMenu.classList.contains('open')
-    ? 'fa fa-xmark' : 'fa fa-bars';
-});
+// Overlay creado dinámicamente
+const navOverlay = document.createElement('div');
+navOverlay.id = 'nav-overlay';
+document.body.appendChild(navOverlay);
+
+function openMobile() {
+  mobileMenu.classList.add('open');
+  navOverlay.classList.add('show');
+  toggle.querySelector('i').className = 'fa fa-xmark';
+  document.body.style.overflow = 'hidden';
+}
 
 function closeMobile() {
   mobileMenu.classList.remove('open');
+  navOverlay.classList.remove('show');
   toggle.querySelector('i').className = 'fa fa-bars';
+  document.body.style.overflow = '';
 }
+
+toggle.addEventListener('click', () => {
+  mobileMenu.classList.contains('open') ? closeMobile() : openMobile();
+});
+navOverlay.addEventListener('click', closeMobile);
+// Cierra en landscape / resize a desktop
+window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMobile(); }, { passive: true });
 
 /* ── Accordion ── */
 document.querySelectorAll('.accordion-btn').forEach(btn => {
@@ -154,3 +169,77 @@ document.querySelectorAll('.btn').forEach(btn => {
 /* ── Hero image float ── */
 const heroImg = document.querySelector('.hero-image img');
 if (heroImg) heroImg.style.animation = 'float 4s ease-in-out infinite';
+
+/* ── Testi dot click ── */
+testiDots.forEach((dot, i) => dot.addEventListener('click', () => goTesti(i)));
+
+/* ── Touch swipe — Testimonials ── */
+(function () {
+  const track = document.getElementById('testiCards');
+  if (!track) return;
+  let sx = 0;
+  track.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const diff = sx - e.changedTouches[0].clientX;
+    if (Math.abs(diff) < 50) return;
+    goTesti(diff > 0
+      ? (testiCurrent + 1) % 3
+      : (testiCurrent - 1 + 3) % 3);
+  }, { passive: true });
+})();
+
+/* ── Portfolio — swipe hint en móvil ── */
+(function () {
+  const slider = document.querySelector('.portfolio-slider');
+  if (!slider || window.innerWidth > 768) return;
+  const hint = document.createElement('p');
+  hint.className = 'swipe-hint';
+  hint.innerHTML = '<i class="fa fa-hand-pointer"></i> Desliza para ver más trabajos';
+  slider.parentElement.insertBefore(hint, slider);
+})();
+
+/* ── Footer accordion — móvil ── */
+(function () {
+  function initAccordion() {
+    const isMobile = window.innerWidth <= 768;
+    document.querySelectorAll('.footer-col').forEach(col => {
+      const h4 = col.querySelector('h4');
+      const ul  = col.querySelector('ul');
+      if (!h4 || !ul) return;
+
+      if (isMobile) {
+        if (!h4.querySelector('.fc-toggle')) {
+          const span = document.createElement('span');
+          span.className = 'fc-toggle';
+          span.textContent = '+';
+          h4.appendChild(span);
+          h4.addEventListener('click', onH4Click);
+        }
+        ul.style.maxHeight = '0px';
+      } else {
+        const span = h4.querySelector('.fc-toggle');
+        if (span) { span.remove(); h4.removeEventListener('click', onH4Click); }
+        ul.style.maxHeight = '';
+        ul.style.overflow  = '';
+      }
+    });
+  }
+
+  function onH4Click() {
+    const h4     = this;
+    const ul     = h4.nextElementSibling;
+    const toggle = h4.querySelector('.fc-toggle');
+    const isOpen = ul.style.maxHeight !== '0px' && ul.style.maxHeight !== '';
+
+    document.querySelectorAll('.footer-col ul').forEach(u => { u.style.maxHeight = '0px'; });
+    document.querySelectorAll('.fc-toggle').forEach(t => { t.textContent = '+'; });
+
+    if (!isOpen) {
+      ul.style.maxHeight = ul.scrollHeight + 'px';
+      if (toggle) toggle.textContent = '−';
+    }
+  }
+
+  initAccordion();
+  window.addEventListener('resize', initAccordion, { passive: true });
+})();
