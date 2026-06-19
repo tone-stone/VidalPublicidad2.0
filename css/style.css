@@ -71,8 +71,8 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: center; justify-content: space-between;
   height: 76px;
 }
-.nav-logo { display: flex; align-items: center; }
-.nav-logo img { height: 56px; width: auto; object-fit: contain; }
+.nav-logo { display: flex; align-items: center; flex-shrink: 0; overflow: hidden; }
+.nav-logo img { height: 48px; max-height: 48px; width: auto; object-fit: contain; display: block; }
 
 .nav-menu { display: flex; align-items: center; gap: 32px; }
 .nav-menu a { font-size: .95rem; font-weight: 500; color: var(--dark); position: relative; }
@@ -346,6 +346,16 @@ img { max-width: 100%; display: block; }
 .swipe-hint      { display: none; }
 .fc-toggle       { display: none; font-size: 1.25rem; font-weight: 300; color: var(--primary); margin-left: auto; line-height: 1; }
 
+/* Overlay del menú — siempre fixed para no romper el layout en desktop */
+#nav-overlay {
+  position: fixed; inset: 0; z-index: 998;
+  background: rgba(0,0,0,.52);
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+  backdrop-filter: blur(2px);
+}
+#nav-overlay.show { opacity: 1; pointer-events: auto; }
+
 /* ── Tablet ≤ 1024px ── */
 @media (max-width: 1024px) {
   .srv-grid    { grid-template-columns: repeat(2, 1fr); }
@@ -360,8 +370,8 @@ img { max-width: 100%; display: block; }
   .container   { padding: 0 16px; }
 
   /* ─ Navbar ─ */
-  .nav-inner    { height: 64px; }
-  .nav-logo img { height: 44px; }
+  .nav-inner    { height: 62px; }
+  .nav-logo img { height: 38px; max-height: 38px; }
   .nav-menu     { display: none; }
   .nav-toggle {
     display: flex; align-items: center; justify-content: center;
@@ -397,16 +407,6 @@ img { max-width: 100%; display: block; }
   .mobile-menu a:hover,
   .mobile-menu a:active { background: var(--primary-lt); color: var(--primary); }
   .mobile-menu .btn { margin: 20px 22px; width: calc(100% - 44px); justify-content: center; min-height: 50px; }
-
-  /* ─ Overlay de fondo (creado en JS) ─ */
-  #nav-overlay {
-    position: fixed; inset: 0; z-index: 998;
-    background: rgba(0,0,0,.52);
-    opacity: 0; pointer-events: none;
-    transition: opacity .3s ease;
-    backdrop-filter: blur(2px);
-  }
-  #nav-overlay.show { opacity: 1; pointer-events: auto; }
 
   /* ─ Hero ─ */
   .hero { padding: 44px 0 0; text-align: center; }
@@ -503,7 +503,7 @@ img { max-width: 100%; display: block; }
   .why-list     { grid-template-columns: 1fr; }
   .section-title h2 { font-size: 1.5rem; }
   .btn          { padding: 12px 20px; font-size: .9rem; }
-  .nav-logo img { height: 38px; }
+  .nav-logo img { height: 34px; max-height: 34px; }
   .stat-num     { font-size: 1.8rem; }
 }
 
